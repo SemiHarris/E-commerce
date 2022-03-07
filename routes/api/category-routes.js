@@ -13,7 +13,6 @@ router.get('/', (req, res) => {
     res.status(500).json(err);
   })
   // be sure to include its associated Products
-  console.log()
 });
 
 router.get('/:id', (req, res) => {
