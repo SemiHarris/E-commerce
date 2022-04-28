@@ -18,7 +18,6 @@ router.get('/', (req, res) => {
         model: Tag,
         through: ProductTag,
         attributes: ['tag_name'],
-        where: {[tag_name]: 'green' },
         as: 'tags'
       }
     ]
@@ -34,11 +33,11 @@ router.get('/', (req, res) => {
 router.get('/:id', (req, res) => {
   // find a single product by its `id`
   Product.findOne({
-    subQuery: false,
     where: {
       id: req.params.id
     },
     attributes: ['id', 'product_name', 'price', 'stock'],
+    
     include: [
       {
         model: Category,
@@ -46,8 +45,8 @@ router.get('/:id', (req, res) => {
       },
       {
         model: Tag,
-        attributes: ['tag_name'],
         through: ProductTag,
+        attributes: ['tag_name'],
         as: 'tags'
       }
     ]
@@ -72,7 +71,12 @@ router.post('/', (req, res) => {
       tagIds: [1, 2, 3, 4]
     }
   */
-  Product.create(req.body)
+  Product.create({
+    product_name: req.body.product_name,
+    price: req.body.price,
+    stock: req.body.stock,
+    category_id: req.body.category_id
+  })
     .then((product) => {
       // if there's product tags, we need to create pairings to bulk create in the ProductTag model
       if (req.body.tagIds.length) {
@@ -97,10 +101,17 @@ router.post('/', (req, res) => {
 // update product
 router.put('/:id', (req, res) => {
   // update product data
-  Product.update(req.body, {
+  Product.update(
+  {
+    product_name: req.body.product_name,
+    price: req.body.price,
+    stock: req.body.stock,
+    tagIds: req.body.tagIds
+  },
+  {
     where: {
-      id: req.params.id,
-    },
+      id: req.params.id
+    }
   })
     .then((product) => {
       // find all associated tags from ProductTag
